@@ -1,4 +1,4 @@
-# tlsextract
+# tlsextract [![GoDoc](http://www.godoc.org/github.com/wybiral/tlsextract?status.svg)](http://www.godoc.org/github.com/wybiral/tlsextract)
 Extract TLS metadata from connection in JSON format.
 
 ## installation options
