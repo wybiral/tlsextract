@@ -9,4 +9,4 @@ https://github.com/wybiral/tlsextract/releases
 
 ### from source
 
-`go get github.com/wybiral/tlsextract`
+`go get github.com/wybiral/tlsextract/cmd/tlsextract`
