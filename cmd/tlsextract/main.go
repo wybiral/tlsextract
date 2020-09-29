@@ -37,8 +37,6 @@ func main() {
 		}
 	}
 
-	fmt.Printf("url: %#v\n", parsedURL)
-
 	if parsedURL.Port() == "" {
 		parsedURL.Host += ":443"
 	}
