@@ -3,36 +3,52 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
-	"strings"
 
 	"github.com/wybiral/tlsextract"
 )
 
+func checkErr(err error) {
+	if err == nil {
+		return
+	}
+
+	fmt.Println("ERROR:", err)
+	os.Exit(1)
+}
+
 func main() {
 	args := os.Args[1:]
 	if len(args) != 1 {
-		fmt.Printf("USAGE:\n    tlsextract domain:port\n\n")
+		fmt.Printf("USAGE:\n    tlsextract < host:port | url >\n\n")
 		fmt.Printf("VERSION:\n    %s\n\n", tlsextract.Version)
 		os.Exit(0)
 	}
-	addr := args[0]
-	// Use :443 as default port
-	if !strings.Contains(addr, ":") {
-		addr = addr + ":443"
+
+	parsedURL, err := url.Parse(args[0])
+	checkErr(err)
+
+	if parsedURL.Host == "" {
+		if parsedURL.Path == "" {
+			parsedURL.Host = parsedURL.Scheme + ":" + parsedURL.Opaque
+		} else {
+			parsedURL.Host = parsedURL.Path
+		}
 	}
+
+	fmt.Printf("url: %#v\n", parsedURL)
+
+	if parsedURL.Port() == "" {
+		parsedURL.Host += ":443"
+	}
+
 	// Get Metadata
-	m, err := tlsextract.FromAddr(addr)
-	if err != nil {
-		fmt.Println("ERROR:", err)
-		os.Exit(1)
-	}
+	m, err := tlsextract.FromAddr(parsedURL.Host)
+	checkErr(err)
+
 	// Encode to JSON
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
-	err = enc.Encode(m)
-	if err != nil {
-		fmt.Println("ERROR:", err)
-		os.Exit(1)
-	}
+	checkErr(enc.Encode(m))
 }
